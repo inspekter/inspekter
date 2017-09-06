@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-'use strict';
+'use strict'
 
+const fs = require('fs')
 const kant = require('./index.js')
 const program = require('commander')
 
@@ -21,5 +22,18 @@ if (program.args.length === 0) {
     ignore: program.ignore || null
   }
 
+  console.log('program.ignore', program.ignore)
+
   kant.analyse(program.args, options)
+    .then((report) => {
+      
+      // TODO: take params in consideration when writing the output
+      const output = JSON.stringify(report, null, 2)
+      fs.writeFile('output.json', output)
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+
+  // TODO: create a writeable stream
 }

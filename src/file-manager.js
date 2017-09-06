@@ -25,6 +25,7 @@ function aggregateByExtension(files) {
   return aggregatedFiles
 }
 
+// FIXME: ignore is not working
 function getFiles(source, options) {
   const deferred = q.defer()
 
@@ -40,8 +41,8 @@ module.exports.parseFiles = (source, options) => {
 
   getFiles(source, options)
     .then((files) => {
-      const result = aggregateByExtension(files)
-      deferred.resolve(result)
+      const aggregatedFiles = aggregateByExtension(files)
+      deferred.resolve(aggregatedFiles)
     })
     .catch((error) => {
       deferred.reject(error)

@@ -1,18 +1,19 @@
 'use strict';
 
 const fileManager = require('./file-manager.js')
-const reportManager = require('./report-manager.js')
+const reporter = require('./reporter.js')
 const q = require('q')
 
 module.exports.analyse = (source, options) => {
-  console.log('analyse()', source, options)
+  console.log('kant#analyse()', source, options)
   const deferred = q.defer()
 
+  // TODO: switch to streams instead of promises
   fileManager.parseFiles(source, options)
     .then((result) => {
-      console.log('result', result)
+      // console.log('result', result)
 
-      return reportManager.analyse(result)
+      return reporter.analyse(result)
     })
     .then((report) => {
       console.log('report', report)
@@ -21,12 +22,6 @@ module.exports.analyse = (source, options) => {
     .catch((error) => {
       deferred.reject(error)
     })
-
-  // TODO: select reporters
-
-  // TODO: aggregate reporters
-
-  // TODO: save report
 
   return deferred.promise
 }
