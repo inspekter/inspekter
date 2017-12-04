@@ -1,6 +1,6 @@
 {
   "name": "inspekter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A static code analysis tool",
   "main": "./src/index.js",
   "bin": "./src/cli/index.js",
@@ -27,6 +27,7 @@
   "dependencies": {
     "chalk": "^2.1.0",
     "cli-table": "^0.3.1",
+    "commander": "^2.12.2",
     "glob": "^7.1.2",
     "npm": "^5.5.1",
     "q": "^1.5.0",
