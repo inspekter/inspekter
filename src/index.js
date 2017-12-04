@@ -7,10 +7,9 @@ const q = require('q')
 module.exports.analyse = (source, options) => {
   const deferred = q.defer()
 
-  // TODO: switch to streams instead of promises
   fileManager.parseFiles(source, options)
     .then((result) => {
-      const report = reporter.analyze(result, (error, report) => {
+      reporter.analyze(result, (error, report) => {
         if (error) {
           deferred.reject(error)
         } else {

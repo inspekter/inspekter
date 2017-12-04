@@ -1,6 +1,5 @@
 'use strict'
 
-const q = require('q')
 const pluginLoader = require('./plugin-loader.js')
 
 function getReporter (plugins, extension) {

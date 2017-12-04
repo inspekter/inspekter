@@ -4,7 +4,7 @@ const glob = require('glob')
 const path = require('path')
 const q = require('q')
 
-function aggregateFilesByExtension(files) {
+function aggregateFilesByExtension (files) {
   let aggregatedFiles = {}
   let extension = null
 
@@ -25,7 +25,7 @@ function aggregateFilesByExtension(files) {
   return aggregatedFiles
 }
 
-function getFiles(source, options) {
+function getFiles (source, options) {
   const deferred = q.defer()
 
   const pattern = source[0]

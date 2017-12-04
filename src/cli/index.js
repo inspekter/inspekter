@@ -14,15 +14,15 @@ program
   .option('-o --output <format>', 'Output format json|html|console')
   .parse(process.argv)
 
-function writeOutput(report, format) {
+function writeOutput (report, format) {
   switch (format) {
     case output.FORMATS.JSON:
       output.json(report, 'report.json')
-      break;
+      break
 
     case output.FORMATS.HTML:
       // TODO
-      break;
+      break
 
     default:
       output.console(report)

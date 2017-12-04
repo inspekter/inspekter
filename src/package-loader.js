@@ -1,9 +1,6 @@
 'use strict'
 
 const npm = require('npm')
-const requireg = require('requireg')
-const q = require('q')
-const deasyncPromise = require('deasync-promise')
 
 const DEFAULT_OPTIONS = {
   isAsync: false,
@@ -79,14 +76,6 @@ function getModules (options, callback) {
   })
 }
 
-function listGlobalInstalledModules () {
-  return listInstalledModules({ global: true })
-}
-
-function listLocalInstalledModules (ignoreDev) {
-  return listInstalledModules({ global: false, ignoreDev: ignoreDev })
-}
-
 function listInstalledModules (options, callback) {
   const opts = {
     loaded: false,
@@ -119,7 +108,6 @@ function mapDependencies (isGlobal) {
 
 module.exports = (regexp, options, callback) => {
   const opts = assignOptions(options, DEFAULT_OPTIONS)
-  let deferred = q.defer()
 
   getModules(opts, (error, modules) => {
     if (error) {

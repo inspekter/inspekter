@@ -13,37 +13,36 @@ module.exports.FORMATS = {
 module.exports.console = (report) => {
   let table
 
-  // TODO: choose color based on result
   report.reports.forEach((item) => {
-    table = new Table();
+    table = new Table()
 
     table.push(
 
       // File
-      { 'File': `${chalk.green(item.file.name)}`},
-      { 'Path': `${chalk.green(item.file.path)}`},
+      { 'File': `${chalk.green(item.file.name)}` },
+      { 'Path': `${chalk.green(item.file.path)}` },
 
       // Maintainability
-      { 'Maintainability': `${chalk.blue(item.maintainability)}`},
+      { 'Maintainability': `${chalk.blue(item.maintainability)}` },
 
       // Lines of code
-      { 'Logical lines of code': `${chalk.blue(item.sloc.logical)}`},
-      { 'Physical lines of code': `${chalk.blue(item.sloc.physical)}`},
+      { 'Logical lines of code': `${chalk.blue(item.sloc.logical)}` },
+      { 'Physical lines of code': `${chalk.blue(item.sloc.physical)}` },
 
       // Cyclomatic complexity
-      { 'Cyclomatic complexity': `${chalk.blue(item.cyclomatic)}`},
+      { 'Cyclomatic complexity': `${chalk.blue(item.cyclomatic)}` },
 
       // Cyclomatic Density
-      { 'Cyclomatic density': `${chalk.blue(item.cyclomaticDensity)}`},
+      { 'Cyclomatic density': `${chalk.blue(item.cyclomaticDensity)}` },
 
       // Halstead
-      { 'Length': `${chalk.blue(item.halstead.length)}`},
-      { 'Vocabulary': `${chalk.blue(item.halstead.vocabulary)}`},
-      { 'Difficulty': `${chalk.blue(item.halstead.difficulty)}`},
-      { 'Volume': `${chalk.blue(item.halstead.volume)}`},
-      { 'Effort': `${chalk.blue(item.halstead.effort)}`},
-      { 'Bugs': `${chalk.blue(item.halstead.bugs)}`},
-      { 'Time': `${chalk.blue(item.halstead.time)}`}
+      { 'Length': `${chalk.blue(item.halstead.length)}` },
+      { 'Vocabulary': `${chalk.blue(item.halstead.vocabulary)}` },
+      { 'Difficulty': `${chalk.blue(item.halstead.difficulty)}` },
+      { 'Volume': `${chalk.blue(item.halstead.volume)}` },
+      { 'Effort': `${chalk.blue(item.halstead.effort)}` },
+      { 'Bugs': `${chalk.blue(item.halstead.bugs)}` },
+      { 'Time': `${chalk.blue(item.halstead.time)}` }
     )
 
     console.log(table.toString())
