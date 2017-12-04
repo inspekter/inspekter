@@ -1,42 +1,41 @@
-'use strict';
+'use strict'
 
 const q = require('q')
+const pluginLoader = require('./plugin-loader.js')
 
-// TODO: change to regexp-module-loader
-const REPORTER_EXTENSION = {
-  'js': require('./reporters/javascript.js')
-}
-
-function isFileExtensionSupported (fileExtension) {
-  return !!REPORTER_EXTENSION[fileExtension]
-}
-
-// TODO: might want to remove this promise :)
-module.exports.analyse = (files) => {
-  console.log('reporter#analyse()')
-  const deferred = q.defer()
-
-  let report = {
-    unsupported: [],
-    reports: []
+function getReporter (plugins, extension) {
+  if (typeof plugins === 'object' && typeof extension === 'string') {
+    return plugins[extension]
   }
 
-  let isSupported = false
-  let result
-  
-  for (let extension in files) {
-    isSupported = isFileExtensionSupported(extension)
-    
-    // TODO: replace this with a stream for each report
-    if (isSupported) {
-      result = REPORTER_EXTENSION[extension].analyse(files[extension])
-      report.reports = report.reports.concat(result)
+  return undefined
+}
+
+module.exports.analyze = (files, callback) => {
+  pluginLoader.loadPlugins(null, (error, plugins) => {
+    if (error) {
+      callback(error)
     } else {
-      report.unsupported.concat(files[extension])
-    }
-  }
-  
-  deferred.resolve(report);
+      let report = {
+        unsupported: [],
+        reports: []
+      }
 
-  return deferred.promise
+      let reporter
+      let result
+
+      for (let extension in files) {
+        reporter = getReporter(plugins, extension)
+
+        if (reporter) {
+          result = reporter.analyze(files[extension])
+          report.reports = report.reports.concat(result)
+        } else {
+          report.unsupported.concat(files[extension])
+        }
+      }
+
+      callback(null, report)
+    }
+  })
 }

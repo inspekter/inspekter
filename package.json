@@ -1,29 +1,35 @@
 {
-  "name": "kant",
-  "version": "1.0.0",
-  "description": "Static code analysis tool",
+  "name": "inspekter",
+  "version": "0.0.1",
+  "description": "A static code analysis tool",
   "main": "./src/index.js",
-  "bin": "./src/cli.js",
+  "bin": "./src/cli/index.js",
   "scripts": {
     "test": "standard && mocha"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kryptogeist/kant.git"
+    "url": "git+https://github.com/inspekter/inspekter.git"
+  },
+  "engines": {
+    "node": ">=4"
   },
   "author": "Pablo Oliveira <kryptogeist@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kryptogeist/kant/issues"
+    "url": "https://github.com/inspekter/inspekter/issues"
   },
-  "homepage": "https://github.com/kryptogeist/kant#readme",
+  "homepage": "https://github.com/inspekter/inspekter#readme",
   "devDependencies": {
     "mocha": "^3.4.2",
     "standard": "^10.0.2"
   },
   "dependencies": {
-    "escomplex": "^2.0.0-alpha",
+    "chalk": "^2.1.0",
+    "cli-table": "^0.3.1",
     "glob": "^7.1.2",
-    "q": "^1.5.0"
+    "npm": "^5.5.1",
+    "q": "^1.5.0",
+    "requireg": "^0.1.7"
   }
 }
