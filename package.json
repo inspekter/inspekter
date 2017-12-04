@@ -5,7 +5,7 @@
   "main": "./src/index.js",
   "bin": "./src/cli/index.js",
   "scripts": {
-    "test": "standard && mocha"
+    "test": "standard"
   },
   "repository": {
     "type": "git",
