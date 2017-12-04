@@ -27,10 +27,9 @@ function aggregateFilesByExtension(files) {
 
 function getFiles(source, options) {
   const deferred = q.defer()
-  // glob(source, options, (error, files) => {
-  console.log('source', source)
-  const pattern = source[0]// + '/**/*'
-  console.log('pattern', pattern)
+
+  const pattern = source[0]
+
   glob(pattern, options, (error, files) => {
     if (error) {
       deferred.reject(error)
@@ -48,7 +47,6 @@ module.exports.parseFiles = (source, options) => {
   getFiles(source, options)
     .then((files) => {
       const aggregatedFiles = aggregateFilesByExtension(files)
-      console.log('aggregatedFiles', aggregatedFiles)
       deferred.resolve(aggregatedFiles)
     })
     .catch((error) => {
