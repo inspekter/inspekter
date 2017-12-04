@@ -1,6 +1,6 @@
 {
   "name": "inspekter",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "A static code analysis tool",
   "main": "./src/index.js",
   "bin": "./src/cli/index.js",
