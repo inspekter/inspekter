@@ -9,13 +9,13 @@ const VERSION = require('../../package.json').version
 program
   .version(VERSION)
   .usage('[options] <file>')
-  .option('-d --dest <dest>', 'Destination folder for the report output')
-  .option('-i --ignore <ignore>', 'Pattern to ignore')
-  .option('-o --output <format>', 'Output format json|html|console')
+  .option('-d, --dest <path>', 'Destination folder for the report output')
+  .option('-i, --ignore <ignore>', 'File or pattern to ignore')
+  .option('-o, --output <format>', 'Output format json|html|console')
   .parse(process.argv)
 
-function writeOutput (report, format) {
-  switch (format) {
+function writeOutput (report, outputFormat) {
+  switch (outputFormat) {
     case output.FORMATS.JSON:
       output.json(report, 'report.json')
       break
@@ -33,12 +33,13 @@ if (program.args.length === 0) {
   console.error('ERROR: You must provide at least one file.')
 } else {
   let options = {
-    ignore: program.ignore || null
+    ignore: program.ignore || null,
+    outputFormat: program.output
   }
 
-  inspekter.analyse(program.args, options)
+  inspekter.analyze(program.args, options)
     .then((report) => {
-      writeOutput(report, options.format, options.dest)
+      writeOutput(report, options.outputFormat, options.dest)
     })
     .catch((error) => {
       console.error(error)
