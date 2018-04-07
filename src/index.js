@@ -4,7 +4,7 @@ const fileManager = require('./file-manager.js')
 const reporter = require('./reporter.js')
 const q = require('q')
 
-module.exports.analyse = (source, options) => {
+module.exports.analyze = (source, options) => {
   const deferred = q.defer()
 
   fileManager.parseFiles(source, options)
