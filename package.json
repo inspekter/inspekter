@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "description": "A static code analysis tool",
   "main": "./src/index.js",
-  "bin": "./src/cli/index.js",
+  "bin": {
+    "inspekter": "./src/cli/index.js"
+  },
   "scripts": {
     "test": "standard"
   },
