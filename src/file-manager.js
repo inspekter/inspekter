@@ -1,8 +1,17 @@
 'use strict'
 
-const glob = require('glob')
 const path = require('path')
-const q = require('q')
+
+function addFile (fileDictionary, extension, file) {
+  if (typeof fileDictionary[extension] === 'undefined') {
+    fileDictionary[extension] = []
+  }
+
+  let fullPath = path.resolve(file)
+  fileDictionary[extension].push(fullPath)
+
+  return fileDictionary
+}
 
 function aggregateFilesByExtension (files) {
   let aggregatedFiles = {}
@@ -14,44 +23,15 @@ function aggregateFilesByExtension (files) {
     if (extension) {
       extension = extension.replace('.', '')
 
-      if (typeof aggregatedFiles[extension] === 'undefined') {
-        aggregatedFiles[extension] = []
-      }
-      let fullPath = path.resolve(file)
-      aggregatedFiles[extension].push(fullPath)
+      aggregatedFiles = addFile(aggregatedFiles, extension, file)
     }
   })
 
   return aggregatedFiles
 }
 
-function getFiles (source, options) {
-  const deferred = q.defer()
+module.exports.parseFiles = (files, options) => {
+  const aggregatedFiles = aggregateFilesByExtension(files)
 
-  const pattern = source[0]
-
-  glob(pattern, options, (error, files) => {
-    if (error) {
-      deferred.reject(error)
-    } else {
-      deferred.resolve(files)
-    }
-  })
-
-  return deferred.promise
-}
-
-module.exports.parseFiles = (source, options) => {
-  let deferred = q.defer()
-
-  getFiles(source, options)
-    .then((files) => {
-      const aggregatedFiles = aggregateFilesByExtension(files)
-      deferred.resolve(aggregatedFiles)
-    })
-    .catch((error) => {
-      deferred.reject(error)
-    })
-
-  return deferred.promise
+  return aggregatedFiles
 }

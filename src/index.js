@@ -6,20 +6,15 @@ const q = require('q')
 
 module.exports.analyze = (source, options) => {
   const deferred = q.defer()
+  const files = fileManager.parseFiles(source, options)
 
-  fileManager.parseFiles(source, options)
-    .then((result) => {
-      reporter.analyze(result, (error, report) => {
-        if (error) {
-          deferred.reject(error)
-        } else {
-          deferred.resolve(report)
-        }
-      })
-    })
-    .catch((error) => {
+  reporter.analyze(files, (error, report) => {
+    if (error) {
       deferred.reject(error)
-    })
+    } else {
+      deferred.resolve(report)
+    }
+  })
 
   return deferred.promise
 }

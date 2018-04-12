@@ -9,7 +9,7 @@ function mapPluginsByExtension (modules) {
   let extension
 
   for (let key in modules) {
-    extension = modules[key].getExtension()
+    extension = modules[key].extension
     plugins[extension] = modules[key]
   }
 
