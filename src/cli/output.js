@@ -10,17 +10,34 @@ module.exports.FORMATS = {
   HTML: 'html'
 }
 
-module.exports.console = (report) => {
+module.exports.console = (report, isFullReport) => {
   let table
+  let rows
 
-  report.reports.forEach((item) => {
+  const target = isFullReport ? report.reports : Object.keys(report.aggregate).map((k) => report.aggregate[k])
+
+  target.forEach((item) => {
     table = new Table()
+
+    const fileOrDirectory = {}
+    const pathOrTotal = {}
+
+    if (isFullReport) {
+      fileOrDirectory['File'] = `${chalk.green(item.file.name)}`
+      pathOrTotal['Path'] = `${chalk.green(item.file.path)}`
+    } else {
+      fileOrDirectory['Directory'] = `${chalk.green(item.file.path)}`
+      pathOrTotal['Number of files'] = `${chalk.green(item.file.total)}`
+    }
+
 
     table.push(
 
       // File
-      { 'File': `${chalk.green(item.file.name)}` },
-      { 'Path': `${chalk.green(item.file.path)}` },
+      fileOrDirectory,
+      pathOrTotal,
+      // { 'File': `${chalk.green(item.file.name)}` },
+      // { 'Path': `${chalk.green(item.file.path)}` },
 
       // Maintainability
       { 'Maintainability': `${chalk.blue(item.maintainability)}` },
@@ -53,7 +70,9 @@ module.exports.html = () => {
   // TODO
 }
 
-module.exports.json = (report, destination) => {
-  const output = JSON.stringify(report, null, 2)
+module.exports.json = (report, isFullReport, destination) => {
+  const target = !isFullReport ? report.aggregate : report
+  const output = JSON.stringify(target, null, 2)
+
   fs.writeFile(destination, output)
 }
