@@ -1,9 +1,10 @@
 'use strict'
 
+const commonPathPrefix = require('common-path-prefix')
 const path = require('path')
 const pluginLoader = require('./plugin-loader.js')
 
-function aggregateByDirectories (reports) {
+function aggregateByDir (_aggregated, reports) {
   let directories = {}
   let dirName;
 
@@ -17,69 +18,25 @@ function aggregateByDirectories (reports) {
     directories[dirName].push(report)
   })
 
-  return directories
+
+  return Object.keys(directories).map(k => {
+    let aggregated = JSON.parse(JSON.stringify(_aggregated))
+    aggregated.meta.total = directories[k].length
+    aggregated.meta.path = k
+    return aggregate(aggregated, directories[k])
+  })
 }
 
-function aggregate (reports) {
-  let aggregated = {}
-  let directories = aggregateByDirectories(reports);
-
-  for (let key in directories) {
-    let length = directories[key].length
-
-    let aggregatedReport = {
-      cyclomatic: 0,
-      file: {
-        path: key,
-        total: length
-      },
-      cyclomaticDensity: 0,
-      halstead: {
-        bugs: 0,
-        difficulty: 0,
-        effort: 0,
-        length: 0,
-        time: 0,
-        vocabulary: 0,
-        volume: 0
-      },
-      maintainability: 0,
-      sloc: {
-        logical: 0,
-        physical: 0
-      }
-    }
-
-    directories[key].forEach((report) => {
-      aggregatedReport.cyclomatic += report.cyclomatic
-      aggregatedReport.cyclomaticDensity += report.cyclomaticDensity
-      aggregatedReport.halstead.bugs += report.halstead.bugs
-      aggregatedReport.halstead.difficulty += report.halstead.difficulty
-      aggregatedReport.halstead.effort += report.halstead.effort
-      aggregatedReport.halstead.length += report.halstead.length
-      aggregatedReport.halstead.time += report.halstead.time
-      aggregatedReport.halstead.vocabulary += report.halstead.vocabulary
-      aggregatedReport.halstead.volume += report.halstead.volume
-      aggregatedReport.maintainability += report.maintainability
-      aggregatedReport.sloc.logical += report.sloc.logical
-      aggregatedReport.sloc.physical += report.sloc.physical
-    })
-
-    aggregatedReport.cyclomatic = aggregatedReport.cyclomatic / length
-    aggregatedReport.cyclomaticDensity = aggregatedReport.cyclomaticDensity / length
-    aggregatedReport.halstead.bugs = aggregatedReport.halstead.bugs / length
-    aggregatedReport.halstead.difficulty = aggregatedReport.halstead.difficulty / length
-    aggregatedReport.halstead.effort = aggregatedReport.halstead.effort / length
-    aggregatedReport.halstead.length = aggregatedReport.halstead.length / length
-    aggregatedReport.halstead.time = aggregatedReport.halstead.time / length
-    aggregatedReport.halstead.vocabulary = aggregatedReport.halstead.vocabulary / length
-    aggregatedReport.halstead.volume = aggregatedReport.halstead.volume / length
-    aggregatedReport.maintainability = aggregatedReport.maintainability / length
-    aggregatedReport.sloc.logical = aggregatedReport.sloc.logical / length
-    aggregatedReport.sloc.physical = aggregatedReport.sloc.physical / length
-
-    aggregated[key] = aggregatedReport
-  }
+function aggregate (aggregated, items) {
+  items.forEach(item => {
+    aggregated.cyclomatic.push(item.cyclomatic)
+    aggregated.halstead.bugs.push(item.halstead.bugs)
+    aggregated.halstead.difficulty.push(item.halstead.difficulty)
+    aggregated.halstead.volume.push(item.halstead.volume)
+    aggregated.maintainability.push(item.maintainability)
+    aggregated.sloc.logical.push(item.sloc.logical)
+    aggregated.sloc.physical.push(item.sloc.physical)
+  })
 
   return aggregated
 }
@@ -89,36 +46,62 @@ function getReporter (plugins, extension) {
     return plugins[extension]
   }
 
-  return undefined
+  return null
 }
 
-module.exports.analyze = (files, callback) => {
+module.exports.analyze = (source, options, callback) => {
   pluginLoader.loadPlugins(null, (error, plugins) => {
     if (error) {
-      callback(error)
-    } else {
-      let report = {
-        unsupported: [],
-        reports: []
-      }
-
-      let reporter
-      let result
-
-      for (let extension in files) {
-        reporter = getReporter(plugins, extension)
-
-        if (reporter) {
-          result = reporter.analyze(files[extension])
-          report.reports = report.reports.concat(result)
-        } else {
-          report.unsupported.concat(files[extension])
-        }
-      }
-
-      report.aggregate = aggregate(report.reports)
-
-      callback(null, report)
+      return callback(error)
     }
+
+    let items = []
+    let files = []
+
+    for (let extension in source) {
+      let reporter = getReporter(plugins, extension)
+
+      if (reporter) {
+        let item = reporter.analyze(source[extension])
+        items.push(item)
+        files.push(source[extension])
+      }
+    }
+
+    files = files.reduce((a, b) => a.concat(b), [])
+
+    let report = {
+      items: items.reduce((a, b) => a.concat(b), [])
+    }
+
+    let aggregated = {
+      cyclomatic: [],
+      halstead: {
+        bugs: [],
+        difficulty: [],
+        volume: []
+      },
+      maintainability: [],
+      sloc: {
+        logical: [],
+        physical: []
+      },
+      meta: {
+        total: null
+      }
+    }
+
+    // Group by directory takes precedence over summarized report
+    if (options.group) {
+      aggregated = aggregateByDir(aggregated, report.items)
+    } else if (options.summary) {
+      aggregated.meta.path = commonPathPrefix(files)
+      aggregated.meta.total = report.items.length
+      aggregated = aggregate(aggregated, report.items)
+    }
+    
+    report.aggregated = aggregated
+
+    return callback(null, report)
   })
 }

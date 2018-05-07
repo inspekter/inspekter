@@ -1,6 +1,7 @@
 'use strict'
 
 const npm = require('npm')
+const requireg = require('requireg')
 
 const DEFAULT_OPTIONS = {
   isAsync: false,
@@ -32,10 +33,9 @@ function filterModuleNames (regexp, modules) {
 function find (regexp, modules) {
   let matches = []
   const regexps = Array.isArray(regexp) ? regexp : [regexp]
-  let results
 
   regexps.forEach((regexp) => {
-    results = filterModuleNames(regexp, modules)
+    const results = filterModuleNames(regexp, modules)
 
     if (results.length > 0) {
       matches = matches.concat(results)
@@ -49,7 +49,7 @@ function loadModules (modules) {
   let result = {}
 
   modules.forEach((module) => {
-    result[module] = require(module)
+    result[module] = requireg(module)
   })
 
   return result
@@ -58,21 +58,21 @@ function loadModules (modules) {
 function getModules (options, callback) {
   listInstalledModules({ global: true }, (error, results) => {
     if (error) {
-      callback(error)
-    } else {
-      let modules = []
-
-      results.forEach((result) => {
-        modules = modules.concat(result.name)
-      })
-
-      // Remove possible duplicates
-      modules = modules.filter((element, index, self) => {
-        return index === self.indexOf(element)
-      })
-
-      callback(null, modules)
+      return callback(error)
     }
+
+    let modules = []
+
+    results.forEach((result) => {
+      modules = modules.concat(result.name)
+    })
+
+    // Remove possible duplicates
+    modules = modules.filter((element, index, self) => {
+      return index === self.indexOf(element)
+    })
+
+    callback(null, modules)
   })
 }
 
@@ -88,11 +88,11 @@ function listInstalledModules (options, callback) {
   npm.load(opts, () => {
     npm.commands.ls([], true, (error, data) => {
       if (error) {
-        callback(error)
-      } else {
-        let modules = extractModulesFromDependencies(data.dependencies, options.global)
-        callback(null, modules)
+        return callback(error)
       }
+
+      let modules = extractModulesFromDependencies(data.dependencies, options.global)
+      callback(null, modules)
     })
   })
 }
@@ -111,11 +111,11 @@ module.exports = (regexp, options, callback) => {
 
   getModules(opts, (error, modules) => {
     if (error) {
-      callback(error)
-    } else {
-      const matches = find(regexp, modules)
-      const result = loadModules(matches)
-      callback(null, result)
+      return callback(error)
     }
+
+    const matches = find(regexp, modules)
+    const result = loadModules(matches)
+    return callback(null, result)
   })
 }

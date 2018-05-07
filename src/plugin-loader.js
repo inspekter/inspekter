@@ -1,15 +1,14 @@
 'use strict'
 
-const rrequire = require('./package-loader.js')
+const packageLoader = require('./package-loader')
 
 const DEFAULT_REGEXP = /^inspekter-plugin-/
 
 function mapPluginsByExtension (modules) {
   let plugins = {}
-  let extension
 
   for (let key in modules) {
-    extension = modules[key].extension
+    const extension = modules[key].extension
     plugins[extension] = modules[key]
   }
 
@@ -17,12 +16,12 @@ function mapPluginsByExtension (modules) {
 }
 
 module.exports.loadPlugins = (regexp, callback) => {
-  rrequire(regexp || DEFAULT_REGEXP, {}, (error, modules) => {
+  packageLoader(regexp || DEFAULT_REGEXP, {}, (error, modules) => {
     if (error) {
-      callback(error)
-    } else {
-      const plugins = mapPluginsByExtension(modules)
-      callback(null, plugins)
+      return callback(error)
     }
+
+    const plugins = mapPluginsByExtension(modules)
+    return callback(null, plugins)
   })
 }

@@ -8,12 +8,12 @@ module.exports.analyze = (source, options) => {
   const deferred = q.defer()
   const files = fileManager.parseFiles(source, options)
 
-  reporter.analyze(files, (error, report) => {
+  reporter.analyze(files, options, (error, report) => {
     if (error) {
-      deferred.reject(error)
-    } else {
-      deferred.resolve(report)
+      return deferred.reject(error)
     }
+
+    return deferred.resolve(report)
   })
 
   return deferred.promise

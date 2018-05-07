@@ -2,52 +2,88 @@
 
 const program = require('commander')
 const inspekter = require('../index.js')
-const output = require('./output.js')
+const output = require('./output')
 
 const VERSION = require('../../package.json').version
+const REPORTERS = output.REPORTERS
 
 program
-  .version(VERSION)
-  .usage('[options] <file>')
-  .option('-d, --dest <path>', 'Destination folder for the report output')
-  .option('-f, --full', 'Display the full report for each file')
-  .option('-i, --ignore <ignore>', 'File or pattern to ignore')
-  .option('-o, --output <format>', 'Output format json|html|console')
-  .parse(process.argv)
+  .version(VERSION, '-v, --version')
+  .usage('[options] <file ...>')
+  // .option('-d, --dest <path>', 'Destination path for the report output')
+  .option('-s, --summary', 'display a summarized report')
+  .option('-g, --group', 'display a summarized report grouped by directory')
+  .option('-r, --reporter <REPORTER>', 'specify a reporter (defaul: terminal)')
 
-function writeOutput (report, options) {
-  switch (options.outputFormat) {
-    case output.FORMATS.JSON:
-      output.json(report, options.isFullReport, 'report.json')
-      break
+program
+  .command('metrics')
+  .description('list available metrics')
+  .action(() => {
+    return printMetrics()
+  })
 
-    case output.FORMATS.HTML:
-      // TODO
-      break
+program
+  .command('*')
+  .action(() => {
+    run()
+  })
 
-    default:
-      output.console(report, options.isFullReport)
-  }
+program.parse(process.argv)
+
+function printMetrics () {
+
 }
 
-if (program.args.length === 0) {
-  console.error('ERROR: You must provide at least one file.')
-} else {
+function run () {
+  if (program.args.length < 2) {
+    return console.error('ERROR: Expected at least one file, received none.')
+  }
+
+  const args = program.args.slice(0, program.args.length - 1)
+
   const options = {
-    ignore: program.ignore || null
+    ignore: program.ignore || null,
+    group: program.group,
+    reporter: program.reporter,
+    summary: program.summary
   }
 
-  const outputOptions = {
-    dest: program.dest,
-    isFullReport: program.full,
-    outputFormat: program.output
-  }
-
-  inspekter.analyze(program.args, options)
+  inspekter.analyze(args, options)
     .then((report) => {
-      writeOutput(report, outputOptions)
+      return writeOutput(report, options)
     })
     .catch((error) => {
       console.error(error)
+      process.exit(1)
     })
+}
+
+function filter(report, options) {
+  if (options.summary || options.group) {
+    return Array.isArray(report.aggregated) ? report.aggregated : [report.aggregated]
+  } else {
+    return report.items
+  }
+}
+
+function writeOutput (report, options) {
+  let items = filter(report, options)
+  
+  switch (options.reporter) {
+    case REPORTERS.JSON:
+      output.json(items, options, 'report.json')
+      break
+
+    case REPORTERS.HTML:
+      // TODO
+      break
+
+    case REPORTERS.ALL:
+      output.json(items, options, 'report.json')
+      output.terminal(items, options)
+      break
+
+    default:
+      output.terminal(items, options)
+  }
 }
