@@ -58,7 +58,7 @@ function run () {
     })
 }
 
-function filter(report, options) {
+function filter (report, options) {
   if (options.summary || options.group) {
     return Array.isArray(report.aggregated) ? report.aggregated : [report.aggregated]
   } else {
@@ -68,7 +68,7 @@ function filter(report, options) {
 
 function writeOutput (report, options) {
   let items = filter(report, options)
-  
+
   switch (options.reporter) {
     case REPORTERS.JSON:
       output.json(items, options, 'report.json')

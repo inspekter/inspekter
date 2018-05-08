@@ -6,10 +6,9 @@ const pluginLoader = require('./plugin-loader.js')
 
 function aggregateByDir (_aggregated, reports) {
   let directories = {}
-  let dirName;
 
   reports.forEach((report) => {
-    dirName = path.dirname(report.file.path)
+    let dirName = path.dirname(report.file.path)
 
     if (!directories[dirName]) {
       directories[dirName] = []
@@ -17,7 +16,6 @@ function aggregateByDir (_aggregated, reports) {
 
     directories[dirName].push(report)
   })
-
 
   return Object.keys(directories).map(k => {
     let aggregated = JSON.parse(JSON.stringify(_aggregated))
@@ -99,7 +97,7 @@ module.exports.analyze = (source, options, callback) => {
       aggregated.meta.total = report.items.length
       aggregated = aggregate(aggregated, report.items)
     }
-    
+
     report.aggregated = aggregated
 
     return callback(null, report)

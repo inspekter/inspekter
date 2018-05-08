@@ -67,9 +67,7 @@ function getRow (Metric, report, options) {
 
   // Add the sparkline and min/max columns if the this is a summarized report
   if (isAggregated) {
-
-    // This is an array of values
-    const values = metric.getValue()
+    const values = metric.getValue() // This is an array of values
     const min = Math.min.apply(null, values).toFixed(2)
     const max = Math.max.apply(null, values).toFixed(2)
 
@@ -96,27 +94,24 @@ function getSeverityColor (severity) {
   }
 }
 
-function printHeader (report, options) {
+function getHeader (report, options) {
   if (options.summary || options.group) {
-    console.log(`${chalk.white.bold.underline(report.meta.path)} (${report.meta.total} files)`)
-  } else {
-    console.log(chalk.white.bold.underline(report.file.path));
+    return `${chalk.white.bold.underline(report.meta.path)} (${report.meta.total} files)`
   }
+
+  return chalk.white.bold.underline(report.file.path)
 }
 
 module.exports = (items, options) => {
-  let columns
-
   items.forEach((item, index, array) => {
     const rows = Metrics.map(Metric => {
       return getRow(Metric, item, options)
     })
 
-    printHeader(item, options)
+    const header = getHeader(item, options)
+    const columns = getColumns(rows, options)
 
-    columns = getColumns(rows, options)
-
-    // Print metrics
+    console.log(header)
     console.log(columns)
 
     // Add a sepator
