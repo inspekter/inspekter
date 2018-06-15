@@ -2,12 +2,10 @@
 
 module.exports.REPORTERS = {
   JSON: 'json',
-  HTML: 'html',
-  TERMINAL: 'terminal'
+  TERMINAL: 'terminal',
+  ALL: 'all'
 }
 
 module.exports.terminal = require('./terminal')
-
-module.exports.html = require('./html')
 
 module.exports.json = require('./json')

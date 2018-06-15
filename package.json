@@ -4,7 +4,7 @@
   "description": "A static code analysis tool",
   "main": "./src/index.js",
   "bin": {
-    "inspekter": "./src/cli/index.js"
+    "inspekter": "./src/cli/inspekter.js"
   },
   "scripts": {
     "test": "standard"
