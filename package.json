@@ -27,7 +27,7 @@
   "dependencies": {
     "chalk": "^2.1.0",
     "cli-table": "^0.3.1",
-    "commander": "^2.12.2",
+    "commander": "^3.0.0",
     "glob": "^7.1.2",
     "npm": "^5.5.1",
     "q": "^1.5.0",
